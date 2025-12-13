@@ -5,18 +5,15 @@
 
 #define MAX_WORDS 100
 
-int main() {
-    char **library = malloc(MAX_WORDS * sizeof(char*));
-    char buffer[100];
-    int count = 0;
-
-    FILE *file = fopen("words.txt", "r");
+int loadwords(char **library, char *filename, buffer) {
+    FILE *file = fopen(filename, "r");
     if (file == NULL) {
         printf("Ошибка! Файл пуст.\n");
-        return 1;
+        return 0;
     }
 
-    srand(time(NULL));
+    int count = 0;
+    
     while (fscanf(file, "%s", buffer) == 1 && count < MAX_WORDS)  {
         if (strlen(buffer) == 5) {
             library[count] = malloc(strlen(buffer) + 1);
@@ -25,7 +22,21 @@ int main() {
         }
     }
     fclose(file);
+    return count;
+}
 
+void inputword() {
+
+}
+
+int main() {
+    char **library = malloc(MAX_WORDS * sizeof(char*));
+    char buffer[100];
+
+    int count = 0;
+    count = loadwords(library, "words.txt", buffer);
+    
+    srand(time(NULL));
     int randomindex = rand() % count;
     char* secretword = library[randomindex];
 
