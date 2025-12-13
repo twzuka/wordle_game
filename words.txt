@@ -1,0 +1,10 @@
+apple
+train
+stone
+radio
+store
+bread
+water
+money
+black
+angry
