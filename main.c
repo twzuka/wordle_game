@@ -4,8 +4,12 @@
 #include <time.h>
 
 #define MAX_WORDS 100
+#define GREEN "\033[32m"
+#define YELLOW "\033[33m"
+#define RESET "\033[0m"
 
-int loadwords(char **library, char *filename, buffer) {
+int loadwords(char **library, char *filename) {
+    char buffer[100];
     FILE *file = fopen(filename, "r");
     if (file == NULL) {
         printf("Ошибка! Файл пуст.\n");
@@ -25,8 +29,18 @@ int loadwords(char **library, char *filename, buffer) {
     return count;
 }
 
-void inputword() {
+void inputword(int i, char* buffer) {
+    printf("Введите слово (попытка %d): ", i + 1);
+    scanf("%99s", buffer);
+}
 
+void greetings() {
+    printf("\n========= Игра Wordle ===========\n");
+    printf("Тема: \n");
+    printf("Слово состоит из 5 англиских букв\n");
+    printf("Всего количество попыток: 6\n");
+    printf("==================================\n");
+    printf("\n");
 }
 
 int main() {
@@ -34,28 +48,31 @@ int main() {
     char buffer[100];
 
     int count = 0;
-    count = loadwords(library, "words.txt", buffer);
+    count = loadwords(library, "words.txt");
     
     srand(time(NULL));
     int randomindex = rand() % count;
     char* secretword = library[randomindex];
 
+    greetings();
+    
+
     int win = 0;
     for (int i = 0; i < 6; i++){
-        printf("Введите слово (попытка %d): ", i + 1);
-        scanf("%s", buffer);
+        inputword(i, buffer);
+
         if(strlen(buffer) != 5) {
-            printf("Слишком короткое слово!\n");
-            break;
+            printf("Не удовлетворяет условие!\n");
+            continue;
         }
 
         for(int j = 0; j < 5; j++){
             if (buffer[j] == secretword[j]){
-                printf("\033[32m%c\033[0m", buffer[j]);
+                printf(GREEN "%c" RESET, buffer[j]);
             } 
             else {
                 if (strchr(secretword, buffer[j]) != NULL) {
-                    printf("\033[33m%c\033[0m", buffer[j]);
+                    printf(YELLOW "%c" RESET, buffer[j]);
                 } 
                 else {
                     printf("%c", buffer[j]);
@@ -72,7 +89,7 @@ int main() {
     }
 
     if (win == 0) {
-        printf("Ты проиграл! Правильно слово: %s\n", secretword);
+        printf("Ты проиграл! Правильное слово: %s\n", secretword);
     }
 
     return 0;
