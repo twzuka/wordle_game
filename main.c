@@ -46,10 +46,18 @@ int test_word(char *buffer, char **library, int count) {
 void welcome() {
     printf("\n========= Игра Wordle ===========\n");
     printf("Тема: \n");
-    printf("Слово состоит из 5 англиских букв\n");
+    printf("Слово состоит из 5 английских букв\n");
     printf("Всего количество попыток: 6\n");
     printf("==================================\n");
     printf("\n");
+}
+
+void clear_trml() {
+    #ifdef _WIN32
+        system("cls");
+    #else
+        system("clear");
+    #endif
 }
 
 int main() {
@@ -65,72 +73,91 @@ int main() {
     }
 
     srand(time(NULL));
-    int randomindex = rand() % count;
-    char* secretword = library[randomindex];
 
+    char answer;
 
-    welcome();
-    
+    do {
+        int randomindex = rand() % count;
+        char* secretword = library[randomindex];
 
-    int win = 0;
-    for (int i = 0; i < 6; i++) {
-        int colors[5] = {0};
-        char tempsecret[6];
-        strcpy(tempsecret, secretword);
+        welcome();
 
-        inputword(i, buffer);
-        if (test_word(buffer, library, count) == 0) {
-            if(strlen(buffer) != 5) {
-            printf("Не удовлетворяет условие!\n");
-            i--;
-            continue;
-        }
-            printf("Такого слова нет!\n");
-            i--;
-            continue;
-        }
+        int win = 0;
+        for (int i = 0; i < 6; i++) {
+            int colors[5] = {0};
+            char tempsecret[6];
+            strcpy(tempsecret, secretword);
 
-        
-
-        for(int j = 0; j < 5; j++) {
-            if (buffer[j] == secretword[j]) {
-                colors[j] = 2;
-                tempsecret[j] = '*';
+            inputword(i, buffer);
+            if (test_word(buffer, library, count) == 0) {
+                if (strlen(buffer) != 5) {
+                printf("Не удовлетворяет условие!\n");
+                i--;
+                continue;
             }
-        }
+                printf("Такого слова нет!\n");
+                i--;
+                continue;
+            }
 
-        for(int j = 0; j < 5; j++) {
-            if (colors[j] != 2) {
-                char *p = strchr(tempsecret, buffer[j]);
-                if (p != NULL) {
-                    colors[j] = 1;
-                    *p = '.';
+            for (int j = 0; j < 5; j++) {
+                if (buffer[j] == secretword[j]) {
+                    colors[j] = 2;
+                    tempsecret[j] = '*';
                 }
             }
-        }
 
-        for (int j = 0; j < 5; j++) {
-            if (colors[j] == 2) {
-                printf(GREEN "%c" RESET, buffer[j]);
-            } else if (colors[j] == 1) {
-                printf(YELLOW "%c" RESET, buffer[j]);
-            } else {
-                printf("%c", buffer[j]);
+            for (int j = 0; j < 5; j++) {
+                if (colors[j] != 2) {
+                    char *p = strchr(tempsecret, buffer[j]);
+                    if (p != NULL) {
+                        colors[j] = 1;
+                        *p = '.';
+                    }
+                }
             }
-        
+
+            for (int j = 0; j < 5; j++) {
+                if (colors[j] == 2) {
+                    printf(GREEN "%c" RESET, buffer[j]);
+                } else if (colors[j] == 1) {
+                    printf(YELLOW "%c" RESET, buffer[j]);
+                } else {
+                    printf("%c", buffer[j]);
+                }
+            
+            }
+            printf("\n");
+
+            if (strcmp(buffer, secretword) == 0) {
+                win++;
+                printf("Ты победил!\n");
+                break;
+            }
         }
+
+        if (win == 0) {
+            printf("\n");
+            printf("==================================\n");
+            printf("Ты проиграл! Правильное было слово: %s\n", secretword);
+        }
+
         printf("\n");
+        printf("==================================\n");
+        printf("Сыграть еще? (y/n): ");
+        scanf(" %c", &answer);
 
-        if (strcmp(buffer, secretword) == 0) {
-            win++;
-            printf("Ты победил!\n");
-            break;
-        }
+        clear_trml();
+
+    } while (answer == 'y');
+    
+    clear_trml();
+
+    for (int i = 0; i < count; i++) {
+        free(library[i]);
     }
 
-    if (win == 0) {
-        printf("Ты проиграл! Правильное слово: %s\n", secretword);
-    }
+    free(library);
 
     return 0;
 }
