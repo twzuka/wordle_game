@@ -12,13 +12,13 @@ int loadwords(char **library, char *filename) {
     char buffer[100];
     FILE *file = fopen(filename, "r");
     if (file == NULL) {
-        printf("Ошибка! Файл пуст.\n");
+        printf("Ошибка! Файл не найден.\n");
         return 0;
     }
 
     int count = 0;
     
-    while (fscanf(file, "%s", buffer) == 1 && count < MAX_WORDS)  {
+    while (fscanf(file, "%s", buffer) == 1 && count < MAX_WORDS) {
         if (strlen(buffer) == 5) {
             library[count] = malloc(strlen(buffer) + 1);
             strcpy(library[count], buffer);
@@ -34,7 +34,16 @@ void inputword(int i, char* buffer) {
     scanf("%99s", buffer);
 }
 
-void greetings() {
+int test_word(char *buffer, char **library, int count) {
+    for (int i = 0; i < count; i++) {
+        if (strcmp(buffer, library[i]) == 0){
+            return 1;
+        }
+    }
+    return 0;
+}
+
+void welcome() {
     printf("\n========= Игра Wordle ===========\n");
     printf("Тема: \n");
     printf("Слово состоит из 5 англиских букв\n");
@@ -50,34 +59,65 @@ int main() {
     int count = 0;
     count = loadwords(library, "words.txt");
     
+    if (count == 0) {
+        printf("Ошибка! Файл пуст!\n");
+        return 0;
+    }
+
     srand(time(NULL));
     int randomindex = rand() % count;
     char* secretword = library[randomindex];
 
-    greetings();
+
+    welcome();
     
 
     int win = 0;
-    for (int i = 0; i < 6; i++){
-        inputword(i, buffer);
+    for (int i = 0; i < 6; i++) {
+        int colors[5] = {0};
+        char tempsecret[6];
+        strcpy(tempsecret, secretword);
 
-        if(strlen(buffer) != 5) {
+        inputword(i, buffer);
+        if (test_word(buffer, library, count) == 0) {
+            if(strlen(buffer) != 5) {
             printf("Не удовлетворяет условие!\n");
+            i--;
+            continue;
+        }
+            printf("Такого слова нет!\n");
+            i--;
             continue;
         }
 
-        for(int j = 0; j < 5; j++){
-            if (buffer[j] == secretword[j]){
-                printf(GREEN "%c" RESET, buffer[j]);
-            } 
-            else {
-                if (strchr(secretword, buffer[j]) != NULL) {
-                    printf(YELLOW "%c" RESET, buffer[j]);
-                } 
-                else {
-                    printf("%c", buffer[j]);
+        
+
+        for(int j = 0; j < 5; j++) {
+            if (buffer[j] == secretword[j]) {
+                colors[j] = 2;
+                tempsecret[j] = '*';
+            }
+        }
+
+        for(int j = 0; j < 5; j++) {
+            if (colors[j] != 2) {
+                char *p = strchr(tempsecret, buffer[j]);
+                if (p != NULL) {
+                    colors[j] = 1;
+                    *p = '.';
                 }
             }
+        }
+
+        for (int j = 0; j < 5; j++) {
+            if (colors[j] == 2) {
+                printf(GREEN "%c" RESET, buffer[j]);
+            } else if (colors[j] == 1) {
+                printf(YELLOW "%c" RESET, buffer[j]);
+            } else {
+                printf("%c", buffer[j]);
+            }
+        
         }
         printf("\n");
 
