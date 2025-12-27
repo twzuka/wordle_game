@@ -109,10 +109,10 @@ int main() {
 
             for (int j = 0; j < 5; j++) {
                 if (colors[j] != 2) {
-                    char *p = strchr(tempsecret, buffer[j]);
-                    if (p != NULL) {
+                    char *loc = strchr(tempsecret, buffer[j]);
+                    if (loc != NULL) {
                         colors[j] = 1;
-                        *p = '.';
+                        *loc = '.';
                     }
                 }
             }
