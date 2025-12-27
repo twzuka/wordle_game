@@ -3,7 +3,7 @@
 #include <string.h>
 #include <time.h>
 
-#define MAX_WORDS 100
+#define MAX_WORDS 20
 #define GREEN "\033[32m"
 #define YELLOW "\033[33m"
 #define RESET "\033[0m"
@@ -45,7 +45,7 @@ int test_word(char *buffer, char **library, int count) {
 
 void welcome() {
     printf("\n========= Игра Wordle ===========\n");
-    printf("Тема: \n");
+    printf("Тема: Еда\n");
     printf("Слово состоит из 5 английских букв\n");
     printf("Всего количество попыток: 6\n");
     printf("==================================\n");
